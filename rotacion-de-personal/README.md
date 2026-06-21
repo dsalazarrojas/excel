@@ -39,7 +39,15 @@ Aplicación Excel para registrar y controlar la rotación de empleados en una or
 
 | Módulo | Descripción |
 |--------|-------------|
-| <!-- completar --> | <!-- completar --> |
+| **Home** | Pantalla de inicio con menú de navegación a todos los módulos y reportes. |
+| **Empleados** | Registro principal de personal. Captura: nombre, departamento, puesto, fechas de ingreso y salida, tipo y motivo de baja, y observaciones. Estado, antigüedad en meses/años y rango de antigüedad se calculan automáticamente. |
+| **Dashboard** | Panel de indicadores en tiempo real: total de empleados, activos, bajas, tasa de rotación (%) y promedio de antigüedad de salidas. Incluye distribución por rango de antigüedad y por departamento. |
+| **Rotación por Departamento** | Tabla dinámica con conteo de movimientos de personal desglosado por área (Administración, Operaciones, Tecnología, Marketing, Ventas, RRHH, Logística, Finanzas). |
+| **Rotación por Tipo de Salida** | Tabla dinámica por categoría de baja: Voluntaria, Involuntaria, Jubilación, Fin de contrato, Otro. |
+| **Rotación por Motivo de Salida** | Tabla dinámica con el motivo específico de cada desvinculación (mejor oferta laboral, reestructuración, jubilación por edad, fin de contrato temporal, cambio de residencia, razones personales, etc.). |
+| **Rotación por Puesto** | Tabla dinámica con distribución de bajas según el cargo o puesto del empleado. |
+| **Rotación por Rango de Antigüedad** | Tabla dinámica que agrupa las salidas en rangos: 1-2 años, 3-5 años y 5+ años. |
+| **Instrucciones de Uso** | Guía de 5 pasos: registro de empleados, captura de bajas, campos automáticos, consulta del Dashboard y uso de los reportes de rotación. |
 
 ---
 
