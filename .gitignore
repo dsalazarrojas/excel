@@ -1,0 +1,19 @@
+# Documentación interna
+GUIA.md
+
+# Archivos temporales de Excel/Office
+~$*.xl*
+~$*.xls
+~$*.xlsx
+~$*.xlsm
+~$*.xlsb
+*.xlsb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Archivos de trabajo locales
+*.tmp
+*.bak
