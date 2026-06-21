@@ -12,6 +12,7 @@ Colección de aplicaciones desarrolladas en Microsoft Excel para resolver necesi
 |---|-----------|-----------|-------------|
 | 1 | [Gimnasio & Escuela de Danza](./gimnasio-escuela-danza/) | Ingreso de datos · Reporteo | Gestión de clientes, membresías, pagos y asistencia a clases. 7 módulos + 11 reportes Power Query. |
 | 2 | [Inventarios de Llantera + Conteo de Aceites](./inventarios-llantera/) | Ingreso de datos · Análisis | Control de inventario de llantas y aceites. Entradas, salidas, transferencias, conteos físicos, órdenes de compra y servicio. FIFO y trazabilidad DOT. |
+| 3 | [Rotación de Personal](./rotacion-de-personal/) | Recursos Humanos | Aplicación Excel para registrar y controlar la rotación de empleados en una organización. |
 
 ---
 
