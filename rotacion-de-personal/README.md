@@ -19,7 +19,7 @@ Aplicación Excel para registrar y controlar la rotación de empleados en una or
 ![Rotación por Departamento](./screenshots/04-rotacion-por-departamento.png)
 
 ### Rotación por tipo de salida
-![Rotación por Tipo de Salida](./screenshots/05-rotacion-por-tipo-salida.png)
+![Rotación por Tipo de Salida](./screenshots/05-rotacion-por-tipo-salida.jpeg)
 
 ### Rotación por motivo de salida
 ![Rotación por Motivo de Salida](./screenshots/06-rotacion-por-motivo-salida.png)
