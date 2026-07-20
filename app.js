@@ -90,16 +90,43 @@
     return payload;
   }
 
+  function wireBuyButtons(scope = document, errorElement = document.getElementById('catalog-error')) {
+    scope.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-buy-product]');
+      if (!button || !scope.contains(button)) return;
+      button.disabled = true;
+      try {
+        const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/checkout/${encodeURIComponent(button.dataset.buyProduct)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }));
+        if (!payload.url) throw new Error('No se recibió una URL de pago.');
+        root.location.href = payload.url;
+      } catch (err) {
+        if (errorElement) { errorElement.textContent = err.message || 'No se pudo iniciar el pago, intenta de nuevo.'; errorElement.classList.remove('hidden'); }
+        else root.console.error(err);
+        button.disabled = false;
+      }
+    });
+  }
+
   function initCatalog() {
     const grid = document.getElementById('apps-grid');
     if (!grid) return;
     const input = document.getElementById('search-input');
     const count = document.getElementById('result-summary');
     const error = document.getElementById('catalog-error');
+    const filters = document.getElementById('category-filters');
     let products = [];
+    let selectedCategory = '';
+    const renderFilters = () => {
+      if (!filters) return;
+      const categories = [...new Set(products.map((product) => String(product.category || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+      filters.innerHTML = ['', ...categories].map((category) => {
+        const active = category === selectedCategory;
+        return `<button type="button" data-category-filter="${escapeHtml(category)}" class="rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${active ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">${escapeHtml(category || 'Todos')}</button>`;
+      }).join('');
+    };
     const render = () => {
       const query = String(input.value || '').trim().toLowerCase();
-      const visible = products.filter((product) => [product.title, product.description, product.category, product.slug].join(' ').toLowerCase().includes(query));
+      const visible = products.filter((product) => [product.title, product.description, product.category, product.slug].join(' ').toLowerCase().includes(query) && (!selectedCategory || String(product.category || '').trim() === selectedCategory));
       count.textContent = `${visible.length} producto${visible.length === 1 ? '' : 's'} disponible${visible.length === 1 ? '' : 's'}`;
       grid.innerHTML = visible.length ? visible.map(renderProductCard).join('') : '<div class="md:col-span-2 xl:col-span-3 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 px-6 py-16 text-center"><span class="material-symbols-outlined text-5xl text-slate-300">search_off</span><h2 class="mt-3 text-xl font-bold">No encontramos productos</h2><p class="mt-2 text-slate-500">Prueba otra búsqueda o solicita el producto que necesitas.</p></div>';
     };
@@ -108,6 +135,7 @@
       try {
         const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/catalog`));
         products = Array.isArray(payload.products) ? payload.products.filter((product) => product.published !== false) : [];
+        renderFilters();
         render();
       } catch (err) {
         error.textContent = err.message || 'No se pudo cargar el catálogo.';
@@ -116,21 +144,14 @@
       }
     };
     input.addEventListener('input', debounce(render, 200));
-    grid.addEventListener('click', async (event) => {
-      const button = event.target.closest('[data-buy-product]');
-      if (!button) return;
-      button.disabled = true;
-      try {
-        const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/checkout/${encodeURIComponent(button.dataset.buyProduct)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }));
-        if (!payload.url) throw new Error('No se recibió una URL de pago.');
-        root.location.href = payload.url;
-      } catch (err) {
-        error.textContent = err.message || 'No se pudo iniciar el pago, intenta de nuevo.';
-        error.classList.remove('hidden');
-        button.disabled = false;
-      }
-    });
+    if (filters) filters.addEventListener('click', (event) => { const button = event.target.closest('[data-category-filter]'); if (!button) return; selectedCategory = button.dataset.categoryFilter || ''; renderFilters(); render(); });
+    wireBuyButtons(grid, error);
     load();
+  }
+
+  function initProductPage() {
+    const page = document.getElementById('product-page');
+    if (page) wireBuyButtons(page, document.getElementById('product-page-error'));
   }
 
   function initRequestForm() {
@@ -186,8 +207,8 @@
     poll();
   }
 
-  const api = { escapeHtml, debounce, formatPrice, renderProductCard, isPublicUrl };
+  const api = { escapeHtml, debounce, formatPrice, renderProductCard, isPublicUrl, wireBuyButtons };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.GoodsStore = api;
-  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', () => { initCatalog(); initRequestForm(); initSuccess(); });
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', () => { initCatalog(); initRequestForm(); initSuccess(); initProductPage(); });
 })(typeof window !== 'undefined' ? window : globalThis);
