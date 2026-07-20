@@ -48,6 +48,7 @@
     const description = escapeHtml(product.description || 'Aplicación lista para usar.');
     const category = escapeHtml(product.category || 'Aplicación de negocio');
     const price = escapeHtml(formatPrice(product.price_cents, product.currency));
+    const productUrl = escapeHtml(`product.html?slug=${encodeURIComponent(product.slug || '')}`);
     const thumbnail = resolveAssetUrl(product.thumbnail_url);
     const video = resolveAssetUrl(product.video_url);
     const visual = thumbnail
@@ -66,7 +67,7 @@
           ${visual}
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
-              <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-primary transition-colors line-clamp-1">${title}</h2>
+              <a href="${productUrl}" class="hover:underline"><h2 class="text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-primary transition-colors line-clamp-1">${title}</h2></a>
               <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300">${category}</span>
             </div>
             <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">${description}</p>
