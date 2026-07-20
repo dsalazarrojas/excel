@@ -28,6 +28,11 @@
     return /^https?:\/\//i.test(String(value || '').trim());
   }
 
+  function resolveAssetUrl(path) {
+    if (!path) return '';
+    return isPublicUrl(path) ? path : `${GOODS_API_BASE}${path}`;
+  }
+
   function formatPrice(priceCents, currency) {
     const amount = Number(priceCents || 0) / 100;
     const code = String(currency || 'MXN').toUpperCase();
@@ -43,14 +48,17 @@
     const description = escapeHtml(product.description || 'Aplicación lista para usar.');
     const category = escapeHtml(product.category || 'Aplicación de negocio');
     const price = escapeHtml(formatPrice(product.price_cents, product.currency));
-    const thumbnail = isPublicUrl(product.thumbnail_key) ? String(product.thumbnail_key) : '';
-    const manual = isPublicUrl(product.preview_pdf_key) ? String(product.preview_pdf_key) : '';
+    const thumbnail = resolveAssetUrl(product.thumbnail_url);
+    const video = resolveAssetUrl(product.video_url);
     const visual = thumbnail
       ? `<img src="${escapeHtml(thumbnail)}" alt="" class="h-12 w-12 rounded-2xl object-cover shrink-0" loading="lazy">`
       : '<div class="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[24px]">table_chart</span></div>';
-    const manualLink = manual
-      ? `<a href="${escapeHtml(manual)}" target="_blank" rel="noopener" class="relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[17px]">description</span>Ver manual</a>`
-      : '<span class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 dark:text-slate-500"><span class="material-symbols-outlined text-[17px]">schedule</span>Manual próximamente</span>';
+    const videoLink = video
+      ? `<a href="${escapeHtml(video)}" target="_blank" rel="noopener" class="relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[17px]">play_circle</span>Ver demo</a>`
+      : '<span class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 dark:text-slate-500"><span class="material-symbols-outlined text-[17px]">schedule</span>Demo próximamente</span>';
+    const manualNote = product.has_manual
+      ? '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-1 text-[11px] font-semibold"><span class="material-symbols-outlined text-[14px]">description</span>Incluye manual</span>'
+      : '';
 
     return `
       <article class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:hover:shadow-slate-950/70 hover:border-primary/30 transition-all duration-200">
@@ -67,9 +75,10 @@
         <div class="flex flex-wrap gap-2 min-h-[2rem] mb-5">
           <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 px-2.5 py-1 text-[11px] font-semibold">Excel / .xlsm</span>
           <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-1 text-[11px] font-semibold">${price}</span>
+          ${manualNote}
         </div>
         <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-          ${manualLink}
+          ${videoLink}
           <button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button>
         </div>
       </article>`;
@@ -165,6 +174,11 @@
         const url = `${GOODS_API_BASE}/api/goods/download/${encodeURIComponent(payload.token)}`;
         const link = document.getElementById('download-link');
         link.href = url; link.classList.remove('hidden');
+        const manualLink = document.getElementById('manual-link');
+        if (payload.has_manual && manualLink) {
+          manualLink.href = `${url}?asset=manual`;
+          manualLink.classList.remove('hidden');
+        }
         state.textContent = 'Tu descarga ha comenzado. Si no se abrió automáticamente, usa el botón de descarga.';
         root.location.href = url;
       } catch (err) { state.textContent = `${err.message || 'No se pudo verificar el pago.'} Reintentando…`; root.setTimeout(poll, 3000); }
