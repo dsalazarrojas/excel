@@ -47,8 +47,12 @@
     const title = escapeHtml(product.title || 'Producto sin título');
     const description = escapeHtml(product.description || 'Aplicación lista para usar.');
     const category = escapeHtml(product.category || 'Aplicación de negocio');
-    const hasAdditionalTiers = product.price_cents_empresa != null || product.price_cents_reventa != null;
-    const price = escapeHtml(`${hasAdditionalTiers ? 'Desde ' : ''}${formatPrice(product.price_cents, product.currency)}`);
+    const isEnglish = root.SITE_LANG === 'en';
+    const cardPriceCents = isEnglish ? product.price_usd_cents : product.price_cents;
+    const cardCurrency = isEnglish ? 'USD' : product.currency;
+    const hasAdditionalTiers = isEnglish ? product.price_usd_cents_empresa != null || product.price_usd_cents_reventa != null : product.price_cents_empresa != null || product.price_cents_reventa != null;
+    const price = cardPriceCents != null ? escapeHtml(`${hasAdditionalTiers ? 'Desde ' : ''}${formatPrice(cardPriceCents, cardCurrency)}`) : '';
+    const buyButton = !isEnglish || product.price_usd_cents != null ? `<button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button>` : '';
     const productUrl = escapeHtml(`p/${encodeURIComponent(product.slug || '')}/`);
     const thumbnail = resolveAssetUrl(product.thumbnail_url);
     const video = resolveAssetUrl(product.video_url);
@@ -77,12 +81,12 @@
         </div>
         <div class="flex flex-wrap gap-2 min-h-[2rem] mb-5">
           <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 px-2.5 py-1 text-[11px] font-semibold">Excel / .xlsm</span>
-          <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-1 text-[11px] font-semibold">${price}</span>
+          ${price ? `<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-1 text-[11px] font-semibold">${price}</span>` : ''}
           ${manualNote}
         </div>
         <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           ${videoLink}
-          <div class="flex items-center gap-2"><a href="${productUrl}" class="relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"><span class="material-symbols-outlined text-[17px]">open_in_new</span>Ver detalle</a><button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button></div>
+          <div class="flex items-center gap-2"><a href="${productUrl}" class="relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"><span class="material-symbols-outlined text-[17px]">open_in_new</span>Ver detalle</a>${buyButton}</div>
         </div>
       </article>`;
   }
@@ -100,7 +104,7 @@
       button.disabled = true;
       try {
         const tier = button.dataset.tier || button.closest('[data-tier]')?.dataset.tier || 'personal';
-        const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/checkout/${encodeURIComponent(button.dataset.buyProduct)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier }) }));
+        const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/checkout/${encodeURIComponent(button.dataset.buyProduct)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier, currency: root.SITE_LANG === 'en' ? 'usd' : 'mxn' }) }));
         if (!payload.url) throw new Error('No se recibió una URL de pago.');
         root.location.href = payload.url;
       } catch (err) {
