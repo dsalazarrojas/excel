@@ -57,14 +57,15 @@
     const videoLink = video
       ? `<a href="${escapeHtml(video)}" target="_blank" rel="noopener" class="relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary transition-colors"><span class="material-symbols-outlined text-[17px]">play_circle</span>Ver demo</a>`
       : '<span class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 dark:text-slate-500"><span class="material-symbols-outlined text-[17px]">schedule</span>Demo próximamente</span>';
-    const manualNote = product.has_manual
-      ? '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-1 text-[11px] font-semibold"><span class="material-symbols-outlined text-[14px]">description</span>Incluye manual</span>'
+    const manualUrl = resolveAssetUrl(product.manual_url);
+    const manualNote = product.has_manual && manualUrl
+      ? `<a href="${escapeHtml(manualUrl)}" target="_blank" rel="noopener" class="relative z-10 inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-1 text-[11px] font-semibold hover:text-primary"><span class="material-symbols-outlined text-[14px]">description</span>Ver manual</a>`
       : '';
 
     return `
       <article class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/70 dark:hover:shadow-slate-950/70 hover:border-primary/30 transition-all duration-200">
         <div class="flex items-start gap-4 mb-4">
-          ${visual}
+          <a href="${productUrl}" class="shrink-0" aria-label="Ver detalle de ${title}">${visual}</a>
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
               <a href="${productUrl}" class="hover:underline"><h2 class="text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-primary transition-colors line-clamp-1">${title}</h2></a>
@@ -80,7 +81,7 @@
         </div>
         <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           ${videoLink}
-          <button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button>
+          <div class="flex items-center gap-2"><a href="${productUrl}" class="relative z-10 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"><span class="material-symbols-outlined text-[17px]">open_in_new</span>Ver detalle</a><button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button></div>
         </div>
       </article>`;
   }
