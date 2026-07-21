@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /product.html
+
+Sitemap: https://excel.gic.mx/sitemap.xml

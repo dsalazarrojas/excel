@@ -49,7 +49,7 @@
     const category = escapeHtml(product.category || 'Aplicación de negocio');
     const hasAdditionalTiers = product.price_cents_empresa != null || product.price_cents_reventa != null;
     const price = escapeHtml(`${hasAdditionalTiers ? 'Desde ' : ''}${formatPrice(product.price_cents, product.currency)}`);
-    const productUrl = escapeHtml(`product.html?slug=${encodeURIComponent(product.slug || '')}`);
+    const productUrl = escapeHtml(`p/${encodeURIComponent(product.slug || '')}/`);
     const thumbnail = resolveAssetUrl(product.thumbnail_url);
     const video = resolveAssetUrl(product.video_url);
     const visual = thumbnail
@@ -139,6 +139,12 @@
       try {
         const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/catalog`));
         products = Array.isArray(payload.products) ? payload.products.filter((product) => product.published !== false) : [];
+        if (root.SITE_LANG === 'en') {
+          try {
+            const translations = await responseJson(await fetch(`${root.I18N_BASE_PATH || ''}i18n/products.en.json`));
+            products = products.map((product) => translations[product.slug] ? { ...product, ...translations[product.slug] } : (root.console.warn(`Missing English translation for ${product.slug}`), product));
+          } catch (err) { root.console.warn('Could not load English product translations.', err); }
+        }
         renderFilters();
         render();
       } catch (err) {

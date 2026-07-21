@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Detalle de producto | Apps de Excel para tu negocio</title><meta name="description" content="Aplicaciones de Excel y .xlsm listas para usar."><link rel="icon" type="image/png" href="assets/gic-logo.png">
+  <title>Detalle de producto | Apps de Excel para tu negocio</title><meta name="description" content="Aplicaciones de Excel y .xlsm listas para usar."><meta name="robots" content="noindex, follow"><link rel="icon" type="image/png" href="assets/gic-logo.png">
   <script>if(localStorage.getItem('gic-theme')==='dark'||(!localStorage.getItem('gic-theme')&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
@@ -27,6 +27,7 @@
     const resolveAssetUrl = (url) => store.isPublicUrl(url) ? url : `${apiBase}${url}`;
     const load = async () => {
       if (!slug) return renderNotFound();
+      try { const staticPage = await fetch(`/p/${encodeURIComponent(slug)}/`, { method: 'HEAD' }); if (staticPage.ok) { location.replace(`/p/${encodeURIComponent(slug)}/`); return; } } catch (_) {}
       try {
         const response = await fetch(`${apiBase}/api/goods/catalog/${encodeURIComponent(slug)}`);
         const product = await response.json().catch(() => ({}));
@@ -45,7 +46,7 @@
         const videoSection = video ? `<div class="aspect-video overflow-hidden rounded-3xl bg-black shadow-xl"><video controls preload="metadata" poster="${escapeHtml(thumbnail)}" class="h-full w-full object-contain" src="${escapeHtml(video)}">Tu navegador no admite video. <a href="${escapeHtml(video)}" target="_blank" rel="noopener">Ver demo</a></video></div>` : `<div class="aspect-video overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">${visual}</div>`;
         const subtitle = escapeHtml(product.subtitle || product.sub_title || product.tagline || 'Aplicación de Excel lista para trabajar');
         page.innerHTML = `<article><a href="./" class="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"><span class="material-symbols-outlined text-[18px]">arrow_back</span>Volver al catálogo</a><section class="mt-5">${videoSection}</section><div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]"><div><div class="flex flex-wrap gap-2"><span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">${category}</span>${manual}</div><h1 class="mt-4 text-3xl font-extrabold sm:text-4xl">${title}</h1><p class="mt-2 text-lg font-medium text-slate-500 dark:text-slate-400">${subtitle}</p><div class="mt-6 aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">${visual}</div><p class="mt-6 whitespace-pre-line leading-relaxed text-slate-600 dark:text-slate-300">${escapeHtml(product.description || 'Aplicación lista para usar.')}</p></div><aside><section><h2 class="text-xl font-bold">Elige tu licencia</h2><div class="mt-4 space-y-3">${tiers}</div><a href="licencia.html#personal" class="mt-4 inline-block text-sm font-semibold text-primary hover:underline">Ver términos de licencia completos</a></section></aside></div></article>`;
-        document.title = `${product.title || 'Producto'} | Apps de Excel para tu negocio`;
+        document.title = `${product.title || 'Producto'} | Apps de Excel para tu negocio`; const metaDescription = document.querySelector('meta[name="description"]'); if (metaDescription) { const text = String(product.description || 'Aplicación de Excel lista para usar.').replace(/\s+/g, ' ').trim(); const cut = text.length > 155 ? `${text.slice(0, 156).replace(/\s+\S*$/, '')}…` : text; metaDescription.setAttribute('content', cut); }
       } catch (_) { renderNotFound(); }
     };
     load();
