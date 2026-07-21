@@ -68,7 +68,7 @@
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
               <a href="${productUrl}" class="hover:underline"><h2 class="text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-primary transition-colors line-clamp-1">${title}</h2></a>
-              <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300">${category}</span>
+              <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">${category}</span>
             </div>
             <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">${description}</p>
           </div>
@@ -80,7 +80,7 @@
         </div>
         <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           ${videoLink}
-          <button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button>
+          <button type="button" data-buy-product="${escapeHtml(product.id)}" class="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60 transition-colors"><span class="material-symbols-outlined text-[16px]">shopping_cart</span>Comprar</button>
         </div>
       </article>`;
   }
