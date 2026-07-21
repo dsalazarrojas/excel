@@ -47,7 +47,8 @@
     const title = escapeHtml(product.title || 'Producto sin título');
     const description = escapeHtml(product.description || 'Aplicación lista para usar.');
     const category = escapeHtml(product.category || 'Aplicación de negocio');
-    const price = escapeHtml(formatPrice(product.price_cents, product.currency));
+    const hasAdditionalTiers = product.price_cents_empresa != null || product.price_cents_reventa != null;
+    const price = escapeHtml(`${hasAdditionalTiers ? 'Desde ' : ''}${formatPrice(product.price_cents, product.currency)}`);
     const productUrl = escapeHtml(`product.html?slug=${encodeURIComponent(product.slug || '')}`);
     const thumbnail = resolveAssetUrl(product.thumbnail_url);
     const video = resolveAssetUrl(product.video_url);
@@ -98,7 +99,8 @@
       if (!button || !scope.contains(button)) return;
       button.disabled = true;
       try {
-        const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/checkout/${encodeURIComponent(button.dataset.buyProduct)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }));
+        const tier = button.dataset.tier || button.closest('[data-tier]')?.dataset.tier || 'personal';
+        const payload = await responseJson(await fetch(`${GOODS_API_BASE}/api/goods/checkout/${encodeURIComponent(button.dataset.buyProduct)}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier }) }));
         if (!payload.url) throw new Error('No se recibió una URL de pago.');
         root.location.href = payload.url;
       } catch (err) {
@@ -202,6 +204,9 @@
           manualLink.href = `${url}?asset=manual`;
           manualLink.classList.remove('hidden');
         }
+        const licenseTier = { personal: 'Personal', empresa: 'Empresa', reventa: 'Reventa' }[payload.license_tier] || 'Personal';
+        const license = document.getElementById('license-tier');
+        if (license) { license.textContent = `Licencia: ${licenseTier}`; license.classList.remove('hidden'); }
         state.textContent = 'Tu descarga ha comenzado. Si no se abrió automáticamente, usa el botón de descarga.';
         root.location.href = url;
       } catch (err) { state.textContent = `${err.message || 'No se pudo verificar el pago.'} Reintentando…`; root.setTimeout(poll, 3000); }
